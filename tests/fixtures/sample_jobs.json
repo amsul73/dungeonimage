@@ -1,0 +1,61 @@
+{
+  "jobs": [
+    {
+      "source": "fixture",
+      "job_id": "1001",
+      "title": "[신입] 서비스 기획자 (PM)",
+      "company": "오픈마켓 스타트업",
+      "url": "https://www.wanted.co.kr/wd/1001",
+      "location": "서울 강남구",
+      "annual_from": 0,
+      "annual_to": 3,
+      "main_tasks": "신규 서비스 기획 및 운영, 화면설계서 작성, 개발/디자인 협업",
+      "requirements": "요구사항 정의서와 화면설계서 작성 경험\nFigma 등 기획 도구 활용 가능\n개발자와 협업 경험\n기획 포트폴리오 제출",
+      "preferred": "SQL 쿼리 작성 가능\nA/B 테스트 경험\nGA4 등 데이터 분석 경험\n애자일 스크럼 환경 경험",
+      "benefits": "자유로운 연차, 재택 병행"
+    },
+    {
+      "source": "fixture",
+      "job_id": "1002",
+      "title": "시니어 프로덕트 매니저",
+      "company": "핀테크 스케일업",
+      "url": "https://www.wanted.co.kr/wd/1002",
+      "location": "서울 영등포구",
+      "annual_from": 5,
+      "requirements": "경력 5년 이상\nPRD 작성 및 지표 설계 경험",
+      "preferred": "핀테크 도메인 경험"
+    },
+    {
+      "source": "fixture",
+      "job_id": "1003",
+      "title": "서비스 기획자 (신입/주니어)",
+      "company": "헬스케어 플랫폼",
+      "url": "https://www.wanted.co.kr/wd/1003",
+      "location": "경기 성남시 분당구",
+      "requirements": "요구사항 정의 및 화면설계 경험\n사용자 리서치 경험",
+      "preferred": "헬스케어 도메인 관심"
+    },
+    {
+      "source": "fixture",
+      "job_id": "1004",
+      "title": "데이터 프로덕트 기획자",
+      "company": "AI 커머스",
+      "url": "https://www.wanted.co.kr/wd/1004",
+      "location": "서울 성동구 성수동",
+      "annual_from": 0,
+      "annual_to": 2,
+      "requirements": "SQL 을 활용한 데이터 분석 역량\n지표 설계 및 퍼널 분석 경험\nA/B 테스트 설계 경험\nAmplitude 등 프로덕트 분석 툴 사용 경험",
+      "preferred": "LLM 기반 서비스 기획 경험\n이커머스 도메인 이해"
+    },
+    {
+      "source": "fixture",
+      "job_id": "1005",
+      "title": "프론트엔드 개발자",
+      "company": "에듀테크",
+      "url": "https://www.wanted.co.kr/wd/1005",
+      "location": "서울 마포구",
+      "requirements": "React 경험",
+      "preferred": "TypeScript"
+    }
+  ]
+}

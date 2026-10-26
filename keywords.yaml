@@ -1,0 +1,155 @@
+# 서비스기획자 / PM 직무 JD에 자주 등장하는 역량 사전.
+#
+#  id      : 내부 식별자 (profile.yaml 에서 이 id 또는 아래 aliases 중 아무 단어로 적어도 인식됩니다)
+#  label   : 알림 메일에 표시될 이름
+#  weight  : 그 역량이 JD에 등장했을 때의 중요도(기본 1.0). 높을수록 점수에 크게 반영됩니다.
+#  aliases : JD 본문에서 이 역량으로 인식할 표기들 (대소문자/공백 무시, 부분일치)
+
+keywords:
+  # ── 기획 산출물 ──────────────────────────────
+  - id: requirement_spec
+    label: 요구사항 정의서
+    weight: 1.2
+    aliases: ["요구사항 정의", "요구사항정의서", "요구사항 명세", "requirement spec", "rfp 분석"]
+  - id: wireframe
+    label: 화면설계서/와이어프레임
+    weight: 1.2
+    aliases: ["화면설계", "화면 설계서", "와이어프레임", "wireframe", "스토리보드", "storyboard", "목업", "mockup"]
+  - id: policy_doc
+    label: 서비스 정책 설계
+    weight: 1.0
+    aliases: ["정책 설계", "정책서", "서비스 정책", "운영 정책", "policy"]
+  - id: ia
+    label: IA/플로우 설계
+    weight: 1.0
+    aliases: ["ia 설계", "information architecture", "유저 플로우", "user flow", "플로우차트", "flow chart", "뎁스 구조"]
+  - id: prd
+    label: PRD 작성
+    weight: 1.1
+    aliases: ["prd", "product requirement", "기획서 작성", "제품 요구사항"]
+
+  # ── 데이터 / 분석 ────────────────────────────
+  - id: sql
+    label: SQL
+    weight: 1.4
+    aliases: ["sql", "쿼리 작성", "mysql", "bigquery", "redash", "메타베이스", "metabase"]
+  - id: ga
+    label: GA/GA4
+    weight: 1.2
+    aliases: ["google analytics", "ga4", " ga ", "구글 애널리틱스"]
+  - id: product_analytics
+    label: 프로덕트 분석 툴
+    weight: 1.2
+    aliases: ["amplitude", "앰플리튜드", "mixpanel", "믹스패널", "appsflyer", "braze", "firebase analytics"]
+  - id: ab_test
+    label: A/B 테스트
+    weight: 1.3
+    aliases: ["a/b 테스트", "ab테스트", "a/b test", "ab test", "실험 설계", "그로스 실험"]
+  - id: metrics
+    label: 지표/KPI 설계
+    weight: 1.3
+    aliases: ["kpi", "핵심 지표", "지표 설계", "지표 정의", "okr", "퍼널 분석", "funnel", "리텐션", "retention", "전환율", "cvr"]
+  - id: data_driven
+    label: 데이터 기반 의사결정
+    weight: 1.1
+    aliases: ["데이터 기반", "데이터 드리븐", "data driven", "데이터 분석", "로그 분석", "이벤트 설계", "트래킹 설계"]
+
+  # ── 리서치 / UX ─────────────────────────────
+  - id: user_research
+    label: 사용자 리서치
+    weight: 1.2
+    aliases: ["사용자 리서치", "유저 리서치", "user research", "인터뷰 설계", "심층 인터뷰", "fgi", "설문 설계", "voc 분석"]
+  - id: usability_test
+    label: 사용성 테스트(UT)
+    weight: 1.0
+    aliases: ["사용성 테스트", "usability test", " ut ", "유저 테스트"]
+  - id: ux_ui
+    label: UX/UI 이해
+    weight: 1.0
+    aliases: ["ux", "ui 개선", "사용자 경험", "ux 라이팅", "디자인 시스템"]
+  - id: persona
+    label: 퍼소나/여정지도
+    weight: 0.8
+    aliases: ["퍼소나", "페르소나", "persona", "고객 여정", "customer journey", "journey map"]
+
+  # ── 협업 / 방법론 ───────────────────────────
+  - id: agile
+    label: 애자일/스크럼
+    weight: 1.1
+    aliases: ["애자일", "agile", "스크럼", "scrum", "스프린트", "sprint", "칸반", "kanban"]
+  - id: jira
+    label: Jira/이슈 트래커
+    weight: 1.0
+    aliases: ["jira", "지라", "confluence", "컨플루언스", "asana", "클릭업", "clickup", "linear"]
+  - id: figma
+    label: Figma
+    weight: 1.2
+    aliases: ["figma", "피그마", "figjam", "스케치", "adobe xd"]
+  - id: notion
+    label: Notion/문서화
+    weight: 0.8
+    aliases: ["notion", "노션", "문서화", "위키 관리"]
+  - id: dev_collab
+    label: 개발/디자인 협업
+    weight: 1.3
+    aliases: ["개발자와 협업", "유관부서", "크로스펑셔널", "cross functional", "직군 간 협업", "개발 협업", "qa 협업", "커뮤니케이션 역량"]
+  - id: project_mgmt
+    label: 일정/프로젝트 관리
+    weight: 1.1
+    aliases: ["일정 관리", "프로젝트 관리", "project management", "r&r", "리스크 관리", "백로그", "backlog", "우선순위"]
+
+  # ── 도메인 / 기술 이해 ──────────────────────
+  - id: api_understanding
+    label: API/기술 이해
+    weight: 1.1
+    aliases: ["api", "db 구조", "데이터베이스 이해", "개발 지식", "기술 이해", "erd", "swagger"]
+  - id: app_service
+    label: 앱 서비스 기획
+    weight: 1.0
+    aliases: ["ios", "android", "앱 서비스", "모바일 앱", "app 기획"]
+  - id: web_service
+    label: 웹 서비스 기획
+    weight: 1.0
+    aliases: ["웹 서비스", "web 기획", "반응형 웹", "admin 기획", "백오피스", "어드민"]
+  - id: ecommerce
+    label: 이커머스 도메인
+    weight: 0.9
+    aliases: ["이커머스", "e-commerce", "커머스", "결제", "pg", "주문", "물류", "정산"]
+  - id: b2b_saas
+    label: B2B/SaaS 도메인
+    weight: 0.9
+    aliases: ["b2b", "saas", "구독 모델", "엔터프라이즈"]
+  - id: fintech
+    label: 핀테크/금융 도메인
+    weight: 0.9
+    aliases: ["핀테크", "fintech", "금융", "보험", "증권", "대출"]
+  - id: ai_service
+    label: AI 서비스 기획
+    weight: 1.0
+    aliases: ["ai 서비스", "llm", "생성형 ai", "챗봇", "추천 알고리즘", "머신러닝 이해", "prompt"]
+  - id: healthcare
+    label: 헬스케어 도메인
+    weight: 0.8
+    aliases: ["헬스케어", "의료", "병원", "digital health"]
+  - id: edtech
+    label: 에듀테크 도메인
+    weight: 0.8
+    aliases: ["에듀테크", "교육 서비스", "edtech", "이러닝"]
+
+  # ── 기타 ───────────────────────────────────
+  - id: gtm
+    label: 서비스 운영/GTM
+    weight: 0.9
+    aliases: ["서비스 운영", "오픈 운영", "gtm", "마케팅 협업", "cs 대응", "고객 응대"]
+  - id: english
+    label: 영어 활용
+    weight: 0.7
+    aliases: ["영어 가능", "영어 커뮤니케이션", "english", "비즈니스 영어", "토익"]
+  - id: portfolio
+    label: 기획 포트폴리오
+    weight: 1.0
+    aliases: ["포트폴리오", "portfolio", "기획 산출물 제출"]
+  - id: side_project
+    label: 사이드 프로젝트 경험
+    weight: 0.9
+    aliases: ["사이드 프로젝트", "side project", "토이 프로젝트", "창업 경험", "동아리 활동", "부트캠프", "인턴 경험"]

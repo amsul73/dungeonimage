@@ -1,0 +1,71 @@
+name: 채용공고 매칭 알림
+
+on:
+  schedule:
+    # 매일 09:17, 18:17 (KST) = 00:17, 09:17 (UTC)
+    - cron: "17 0,9 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "알림 기록을 남기지 않고 결과만 확인"
+        type: boolean
+        default: false
+      threshold:
+        description: "알림 최소 점수 (비우면 profile.yaml 값)"
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: job-alert
+  cancel-in-progress: false
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: 의존성 설치
+        run: pip install -r requirements.txt
+
+      - name: 공고 수집 → 채점 → 메일 발송
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          MATCH_THRESHOLD: ${{ inputs.threshold }}
+        run: |
+          python main.py run \
+            --notifier email \
+            --verbose \
+            ${{ inputs.dry_run == true && '--dry-run' || '' }}
+
+      - name: 알림 기록 커밋 (중복 알림 방지)
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          if git diff --quiet -- state/seen.json; then
+            echo "변경된 알림 기록 없음"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/seen.json
+          git commit -m "chore: 알림 기록 갱신 [skip ci]"
+          for attempt in 1 2 3 4; do
+            git push && break
+            echo "push 실패, 재시도 $attempt"
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            sleep $((2 ** attempt))
+          done
