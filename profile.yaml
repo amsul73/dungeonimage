@@ -1,57 +1,93 @@
 # ============================================================================
 #  내 프로필 + 검색 조건  ―  이 파일만 고치면 알림 기준이 바뀝니다.
-#  (이력서/포트폴리오를 아직 받지 못해 "신입 서비스기획자/PM" 기준 초안으로 채워뒀습니다.
-#   have / highlights 를 본인 실제 경험으로 꼭 수정하세요. 수정 후 `python main.py profile` 로 확인)
+#  (이력서.docx / 포트폴리오.pptx 내용을 반영해 작성됨. 2026-10-26)
 # ============================================================================
 
 me:
-  name: "지원자"
-  target_role: "서비스 기획자 / PM (신입)"
+  name: "이준행"
+  target_role: "서비스 기획자 / PM (2026.02 졸업, 신입)"
+  summary: >-
+    사용자 인터뷰로 문제를 정의하고 MVP 범위를 좁혀 5인 스쿼드로 구현까지 끌고 간 PM.
+    컴퓨터공학 전공 기반으로 AI 워크플로를 직접 설계·구현.
 
 # ── 1. 내가 가진 역량 ────────────────────────────────────────────────────────
-#  keywords.yaml 의 id 또는 그 안의 표기(예: "피그마", "SQL")를 그대로 써도 됩니다.
 #  level 1~5 : 1=들어본 수준, 2=학습/과제 경험, 3=프로젝트에서 직접 사용,
 #              4=반복 경험으로 익숙, 5=남에게 가르칠 수 있음
 #  level 3 이상이어야 "충족"으로 100% 반영되고, 1~2 는 부분 점수만 받습니다.
 have:
-  requirement_spec: 3
-  wireframe: 3
-  figma: 3
-  ia: 3
-  policy_doc: 2
-  prd: 2
-  user_research: 3
-  usability_test: 2
-  persona: 3
-  ux_ui: 3
-  metrics: 2
-  data_driven: 2
-  sql: 2
-  ga: 2
-  ab_test: 1
-  agile: 2
-  jira: 2
-  notion: 3
-  dev_collab: 3
-  project_mgmt: 3
-  web_service: 3
-  app_service: 2
-  api_understanding: 1
-  portfolio: 3
-  side_project: 3
+  # 기획 산출물 — 루미코드·픽포유에서 PRD/기능명세서/40+ 와이어프레임 직접 작성
+  requirement_spec: 4     # 요구사항 정의서, 기능명세서
+  prd: 4                  # PRD 작성 (2개 프로덕트)
+  wireframe: 4            # 40+ 장 와이어프레임, 프로토타이핑
+  ia: 4                   # User Journey Map, User Flow 설계
+  figma: 4                # 화면 설계·프로토타이핑 주 도구
+  handoff: 4              # 개발 핸드오프 문서, 예외 상황 정렬
+  policy_doc: 4           # 약관, 운영 정책서, 예약금·환불·분쟁 가이드라인
 
-# ── 2. 포트폴리오 하이라이트 (알림 메일에 "이 공고엔 이 경험을 쓰세요"로 같이 표시) ──
-#  keywords: 이 프로젝트로 어필 가능한 역량 id 들
+  # 기획 방식 — 가설→실험→검증 루프, MVP 스코프 좁히기
+  mvp: 4                  # MVP 스코프/우선순위 결정 (Pain·Impact·Feasibility 기준)
+  user_research: 4        # 심층 인터뷰 10명×2, 사진가 4명, 동아리 1팀
+  persona: 3              # User Journey Map, 양면 사용자 시나리오
+  ux_ui: 3                # Nudge 기반 UX 시나리오, 심리적 허들 제거 설계
+  usability_test: 2       # QA 중심, 정식 UT 경험은 아직 없음
+
+  # AI / 자동화 — 가장 차별화되는 강점
+  ai_service: 5           # AI 중재 모델 기획, Claude API 기반 서비스 설계
+  prompt_eng: 5           # 프롬프트 로직·Output Rule 직접 설계 및 반복 개선
+  automation: 5           # Shorts·게임 에셋 End-to-End 파이프라인 구축
+  python: 3               # Python/Pillow/MoviePy 기반 자동화 스크립팅
+
+  # 협업 / 관리
+  dev_collab: 4           # 디자인 2·개발 2 스쿼드 정렬, API 스펙 협의
+  project_mgmt: 4         # 일정 조율, 우선순위, 개발 로드맵 수립
+  qa: 3                   # 구현 결과와 기획 의도 비교 검수
+  notion: 4               # 주 문서화 도구
+  agile: 2                # 가설-실험-검증 루프 경험, 정식 스크럼은 아직
+  jira: 1                 # Notion 중심, Jira는 미경험
+
+  # 기술 이해
+  api_understanding: 4    # 컴퓨터공학 전공, API 스펙 협의, DB 구조 이해
+  web_service: 3
+  app_service: 3
+
+  # 데이터 — 지표는 설계했으나 실사용자 데이터 경험은 없음(솔직하게 낮게)
+  metrics: 3              # 생성시간·성공률·수동수정·비용 KPI 설계, 검증 지표 정의
+  data_driven: 3          # 기록→비교→가설 검증 방식
+  sql: 1                  # DB 구조 이해 수준, 쿼리 작성 경험은 적음
+  ab_test: 1              # 단계별 가설 검증 경험, 정식 A/B 테스트는 아직
+  # ga, product_analytics(앰플리튜드 등)는 미경험이라 넣지 않음
+  #  → 배우면 아래에 추가하세요. 데이터 요구가 강한 공고 점수가 바로 올라갑니다.
+
+  # 도메인
+  marketplace: 4          # 픽포유 양면 플랫폼(공급자/소비자) 전 과정
+  game: 3                 # 던전 매니지먼트 게임 PM, Unity 적용
+  content_media: 3        # 숏폼 파이프라인, 스트리밍·리뷰 채널 운영
+  ecommerce: 2            # 예약금·환불·정산 등 거래 정책 설계
+  gtm: 3                  # 서비스 운영 정책 수립, 채널 운영
+
+  portfolio: 4            # PM 포트폴리오 21p 보유
+  side_project: 4         # 개인 AI 프로젝트 2건 + 콘텐츠 채널 2건
+
+# ── 2. 포트폴리오 하이라이트 (알림 메일에 "이 공고엔 이 경험을 쓰세요"로 표시) ──
 highlights:
-  - title: "졸업작품/사이드 프로젝트 - 웹 서비스 기획"
-    summary: "요구사항 정의부터 화면설계서까지 단독 기획, 개발 2명과 8주 협업"
-    keywords: [requirement_spec, wireframe, figma, dev_collab, web_service, side_project]
-  - title: "사용자 리서치 과제"
-    summary: "타깃 유저 10명 심층 인터뷰 → 퍼소나/고객여정 도출 → 개선안 제안"
-    keywords: [user_research, persona, usability_test, ux_ui]
-  - title: "데이터 분석 스터디/부트캠프"
-    summary: "GA 데모 계정 퍼널 분석, SQL 기초 쿼리로 리텐션 지표 산출"
-    keywords: [sql, ga, metrics, data_driven]
+  - title: "루미코드 — 공동생활 규칙 관리 및 AI 중재 서비스 (PM, 6개월, 5인 스쿼드)"
+    summary: "경험자 10명 인터뷰로 '불만을 직접 말하기 어려움'을 핵심 문제로 정의 → AI 대화 가이드를 Core로 MVP 범위 확정 → User Flow·40+ 와이어프레임·PRD·기능명세서 작성 → 개발 핸드오프·QA까지 리드"
+    keywords: [user_research, mvp, requirement_spec, prd, wireframe, ia, handoff,
+               ai_service, prompt_eng, dev_collab, project_mgmt, qa, policy_doc, ux_ui]
+
+  - title: "픽포유 — 아마추어 사진가·소비자 매칭 플랫폼 (PM, 6개월, 5인 스쿼드)"
+    summary: "소비자 10명·작가 4명 인터뷰로 양면 문제를 Trust·Discovery로 좁힘 → 작가 승인제·스타일 태그·상호 리뷰 결정 → 예약금·환불·분쟁 운영 정책서까지 설계"
+    keywords: [marketplace, user_research, mvp, policy_doc, ecommerce, requirement_spec,
+               ia, dev_collab, project_mgmt, persona, gtm]
+
+  - title: "Shorts AI 워크플로 — 콘텐츠 제작 End-to-End 자동화 (1인 기획·구현)"
+    summary: "RSS 수집 → Claude API 스크립트 → Google TTS → MoviePy/FFmpeg 합성 파이프라인 구축. 편당 2~3시간 → 약 10분. 생성시간·성공률·수동수정·비용 5개 KPI로 안정성 측정 중"
+    keywords: [automation, prompt_eng, ai_service, python, metrics, data_driven,
+               content_media, mvp]
+
+  - title: "AI 게임 에셋 워크플로 — 반복 사용 가능한 제작 파이프라인 (PM 겸 설계)"
+    summary: "이미지 생성 AI + Pillow 전처리 + 스프라이트시트 + 모션 생성까지 단일 워크플로로 연결. 고블린·놀·스켈레톤 3종 제작, Unity 임포트 규칙까지 재사용 구조로 정리"
+    keywords: [automation, ai_service, python, game, project_mgmt, handoff]
 
 # ── 3. 공고 검색 조건 (수집 단계에서 걸러냄) ──────────────────────────────────
 search:

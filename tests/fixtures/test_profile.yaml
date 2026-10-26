@@ -1,0 +1,81 @@
+# 테스트 전용 프로필. 실제 profile.yaml 을 고쳐도 테스트가 깨지지 않도록 분리해 둔 고정값.
+me:
+  name: "테스트"
+  target_role: "서비스 기획자 / PM (신입)"
+
+have:
+  requirement_spec: 3
+  wireframe: 3
+  figma: 3
+  ia: 3
+  policy_doc: 2
+  prd: 2
+  user_research: 3
+  usability_test: 2
+  persona: 3
+  ux_ui: 3
+  metrics: 2
+  data_driven: 2
+  sql: 2
+  ga: 2
+  ab_test: 1
+  agile: 2
+  jira: 2
+  notion: 3
+  dev_collab: 3
+  project_mgmt: 3
+  web_service: 3
+  app_service: 2
+  api_understanding: 1
+  portfolio: 3
+  side_project: 3
+
+highlights:
+  - title: "졸업작품/사이드 프로젝트 - 웹 서비스 기획"
+    summary: "요구사항 정의부터 화면설계서까지 단독 기획"
+    keywords: [requirement_spec, wireframe, figma, dev_collab, web_service, side_project]
+  - title: "사용자 리서치 과제"
+    summary: "타깃 유저 10명 심층 인터뷰"
+    keywords: [user_research, persona, usability_test, ux_ui]
+  - title: "데이터 분석 스터디"
+    summary: "GA 퍼널 분석, SQL 기초 쿼리"
+    keywords: [sql, ga, metrics, data_driven]
+
+search:
+  wanted_tag_ids: [10110, 10231]
+  locations: ["seoul"]
+  years: 0
+  limit_per_page: 50
+  max_pages: 4
+  fetch_detail_limit: 80
+
+filters:
+  require_seoul: true
+  seoul_tokens: ["서울", "seoul", "강남", "성수"]
+  max_required_years: 1
+  allow_experience_unknown: true
+  exclude_title_keywords:
+    ["개발자", "엔지니어", "developer", "engineer", "디자이너", "designer",
+     "마케터", "영업", "세일즈", "회계", "인사담당", "리드", "lead",
+     "팀장", "헤드", "head", "시니어", "senior", "총괄"]
+  target_title_keywords:
+    ["서비스 기획", "서비스기획", "프로덕트 기획", "기획자", "pm", "po",
+     "product manager", "product owner", "프로덕트 매니저", "신입", "주니어", "junior"]
+
+scoring:
+  requirement_weight: 0.65
+  preferred_weight: 0.35
+  title_bonus: 8
+  newcomer_bonus: 5
+  unknown_section_score: 0.5
+  partial_level_factor:
+    1: 0.4
+    2: 0.7
+    3: 1.0
+    4: 1.0
+    5: 1.0
+
+notify:
+  threshold: 65
+  max_jobs_per_mail: 10
+  subject_prefix: "[기획 공고 알림]"

@@ -35,32 +35,38 @@
 
 ---
 
-## 2. 먼저 할 일: `profile.yaml` 을 내 이력서로 고치기
+## 2. `profile.yaml` — 점수의 기준
 
-> ⚠️ 지금 들어 있는 `have` / `highlights` 값은 **이력서를 받지 못해 "신입 기획자" 기준으로 채워 둔 초안**입니다.
-> 실제 경험으로 반드시 수정하세요. 이 파일이 점수의 기준입니다.
+이력서(.docx)와 포트폴리오(.pptx) 내용을 반영해 이미 채워져 있습니다.
+루미코드·픽포유·Shorts AI 워크플로·AI 게임 에셋 워크플로 4개 프로젝트가
+`highlights` 로 들어가 있고, 역량 레벨은 아래처럼 잡혀 있습니다.
+
+| 레벨 | 역량 |
+|---|---|
+| 5 | AI 서비스 기획, 프롬프트 설계, 업무 자동화 |
+| 4 | 요구사항 정의서·PRD·와이어프레임·IA, Figma, 핸드오프, 운영 정책, MVP 스코프, 사용자 리서치, 개발 협업, 프로젝트 관리, API/기술 이해, 양면 플랫폼, Notion |
+| 3 | 퍼소나, UX/UI, Python, QA, 지표·KPI 설계, 데이터 기반 의사결정, 웹/앱 기획, 게임·콘텐츠 도메인, 운영/GTM |
+| 2 | UT, 애자일, 이커머스 |
+| 1 | SQL, A/B 테스트, Jira |
+| 미보유 | GA/GA4, 앰플리튜드 등 프로덕트 분석 툴 |
+
+레벨 1~2는 부분 점수만 받으므로, **SQL·GA·A/B 테스트를 배우면 데이터 요구가 강한 공고의 점수가 바로 올라갑니다.**
+새 역량이 생기면 `have` 에 한 줄 추가하거나 레벨만 올리면 됩니다.
 
 ```yaml
 have:
-  requirement_spec: 3   # 1=들어본 수준  2=학습/과제  3=프로젝트에서 직접  4=익숙  5=가르칠 수 있음
-  figma: 3
-  sql: 2
-
-highlights:
-  - title: "졸업작품 - OO 서비스 기획"
-    summary: "요구사항 정의부터 화면설계서까지 단독 기획, 개발 2명과 8주 협업"
-    keywords: [requirement_spec, wireframe, figma, dev_collab]
+  sql: 3          # 1=들어본 수준  2=학습/과제  3=프로젝트에서 직접  4=익숙  5=가르칠 수 있음
+  ga: 2
 ```
 
-`keywords.yaml` 에 없는 역량은 그 파일에 항목을 추가하면 됩니다(별칭에 JD에 쓰이는 표기를 넣어주세요).
+`keywords.yaml` 에 없는 역량은 그 파일에 항목을 추가하세요(별칭에 JD에서 쓰이는 표기를 넣어주세요).
 
 수정 후 확인:
 
 ```bash
 python main.py profile       # 인식된 역량/레벨, 사전에 없는 표기 확인
+python -m pytest tests -q    # profile.yaml 오타·구조 오류까지 검사
 ```
-
----
 
 ## 3. 로컬에서 먼저 돌려보기
 
@@ -159,7 +165,7 @@ jobalert/
   sources/               공고 수집기 (base.py, wanted.py, 레지스트리)
   notifiers/             알림 채널 (email.py, console.py)
 state/seen.json          알림 기록
-tests/                   pytest (47개)
+tests/                   pytest (51개, 테스트용 프로필 분리)
 ```
 
 ### 수집 사이트 추가하기

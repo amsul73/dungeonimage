@@ -6,8 +6,10 @@ from jobalert.cli import main
 from jobalert.models import JobPosting
 from jobalert.pipeline import evaluate
 from jobalert.store import SeenStore
+from tests.conftest import TEST_PROFILE
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_jobs.json"
+PROFILE_ARGS = ["--profile", str(TEST_PROFILE)]
 
 
 def load_fixture() -> list[JobPosting]:
@@ -48,6 +50,7 @@ def test_seen_jobs_are_not_renotified(profile, tmp_path):
 def test_cli_run_with_fixture_is_idempotent(tmp_path, capsys):
     state = tmp_path / "seen.json"
     args = [
+        *PROFILE_ARGS,
         "run", "--fixture", str(FIXTURE), "--notifier", "console", "--state", str(state),
     ]
     assert main(args) == 0
@@ -62,7 +65,7 @@ def test_cli_run_with_fixture_is_idempotent(tmp_path, capsys):
 
 def test_cli_dry_run_does_not_write_state(tmp_path, capsys):
     state = tmp_path / "seen.json"
-    main(["run", "--fixture", str(FIXTURE), "--notifier", "console",
+    main([*PROFILE_ARGS, "run", "--fixture", str(FIXTURE), "--notifier", "console",
           "--state", str(state), "--dry-run"])
     capsys.readouterr()
     assert not state.exists()
@@ -70,7 +73,7 @@ def test_cli_dry_run_does_not_write_state(tmp_path, capsys):
 
 def test_cli_threshold_override_changes_matches(tmp_path, capsys):
     state = tmp_path / "seen.json"
-    main(["run", "--fixture", str(FIXTURE), "--notifier", "console",
+    main([*PROFILE_ARGS, "run", "--fixture", str(FIXTURE), "--notifier", "console",
           "--state", str(state), "--dry-run", "--threshold", "30"])
     out = capsys.readouterr().out
     assert "새 알림 2건" in out
@@ -84,7 +87,7 @@ def test_cli_score_reads_stdin(monkeypatch, capsys):
 - SQL 활용 경험
 """
     monkeypatch.setattr("sys.stdin", __import__("io").StringIO(jd))
-    assert main(["score", "-", "--title", "서비스 기획자"]) == 0
+    assert main([*PROFILE_ARGS, "score", "-", "--title", "서비스 기획자"]) == 0
     out = capsys.readouterr().out
     assert "총점" in out and "자격요건 100%" in out
 

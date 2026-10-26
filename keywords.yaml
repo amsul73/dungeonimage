@@ -136,6 +136,50 @@ keywords:
     weight: 0.8
     aliases: ["에듀테크", "교육 서비스", "edtech", "이러닝"]
 
+  # ── 추가: 이력서 강점과 맞물리는 역량 ─────────
+  - id: automation
+    label: 업무 자동화/워크플로
+    weight: 1.2
+    aliases: ["업무 자동화", "자동화 파이프라인", "워크플로 설계", "workflow", "rpa",
+              "프로세스 자동화", "자동화 경험", "n8n", "zapier", "make.com"]
+  - id: prompt_eng
+    label: 프롬프트 설계
+    weight: 1.2
+    aliases: ["프롬프트", "prompt", "프롬프트 엔지니어링", "prompt engineering",
+              "llm 활용", "ai 활용 역량", "생성형 ai 활용"]
+  - id: python
+    label: Python/스크립팅
+    weight: 1.0
+    aliases: ["python", "파이썬", "스크립팅", "스크립트 작성", "코드 작성 가능"]
+  - id: mvp
+    label: MVP 스코프 설계
+    weight: 1.2
+    aliases: ["mvp", "최소 기능 제품", "스코프 관리", "스코프 정의", "린 스타트업",
+              "가설 검증", "린 개발", "0 to 1", "신규 서비스 런칭"]
+  - id: marketplace
+    label: 양면 플랫폼/마켓플레이스
+    weight: 1.0
+    aliases: ["양면 시장", "양면 플랫폼", "two-sided", "마켓플레이스", "marketplace",
+              "매칭 플랫폼", "중개 플랫폼", "공급자", "수요자"]
+  - id: qa
+    label: QA/기획 검수
+    weight: 1.0
+    aliases: ["qa", "검수", "테스트 케이스", "기획 검수", "릴리즈 검증", "오픈 검증"]
+  - id: handoff
+    label: 개발 핸드오프 문서
+    weight: 1.0
+    aliases: ["핸드오프", "handoff", "기능명세서", "기능 명세", "스펙 문서",
+              "예외 처리 정의", "엣지 케이스"]
+  - id: game
+    label: 게임 도메인
+    weight: 0.9
+    aliases: ["게임 기획", "게임 서비스", "unity", "유니티", "인게임", "라이브 서비스 운영"]
+  - id: content_media
+    label: 콘텐츠/미디어 도메인
+    weight: 0.9
+    aliases: ["콘텐츠 기획", "숏폼", "미디어 서비스", "크리에이터", "영상 서비스",
+              "ugc", "커뮤니티 서비스"]
+
   # ── 기타 ───────────────────────────────────
   - id: gtm
     label: 서비스 운영/GTM
