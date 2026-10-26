@@ -25,6 +25,9 @@ class JobPosting:
     preferred: str = ""
     benefits: str = ""
     raw_text: str = ""
+    # "full" = JD 본문까지 확보, "summary" = 제목·직무키워드 등 요약 정보만
+    detail_level: str = "full"
+    tags: list[str] = field(default_factory=list)
 
     @property
     def key(self) -> str:
@@ -49,10 +52,11 @@ class SectionScore:
 
     name: str
     ratio: float                      # 0.0 ~ 1.0
+    available: bool = True            # 해당 섹션 텍스트가 공고에 있었는지
     matched: list[str] = field(default_factory=list)   # 충족한 역량 label
     missing: list[str] = field(default_factory=list)   # 부족한 역량 label
     partial: list[str] = field(default_factory=list)   # 레벨이 낮아 부분 점수인 역량
-    inferred: bool = False            # 섹션을 못 찾아 중립값을 쓴 경우 True
+    inferred: bool = False            # 텍스트는 있으나 아는 역량을 못 찾아 중립값을 쓴 경우
 
 
 @dataclass

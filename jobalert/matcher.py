@@ -103,10 +103,23 @@ def score_section(
     profile: Profile,
 ) -> SectionScore:
     """섹션에서 요구하는 역량 대비 내 보유 역량의 가중 충족도."""
+    if not text.strip():
+        # 공고(또는 소스)가 이 섹션을 제공하지 않음 → 점수 계산에서 제외한다
+        return SectionScore(name=name, ratio=0.0, available=False)
+
     required: list[Keyword] = profile.dictionary.extract(text)
-    if not required:
+    # 근거가 너무 적으면(역량 1개 등) 비율이 0% 또는 100% 로 튀므로 판단을 보류한다
+    minimum = int(profile.scoring.get("min_keywords_for_confidence", 2))
+    if len(required) < minimum:
         neutral = float(profile.scoring.get("unknown_section_score", 0.5))
-        return SectionScore(name=name, ratio=neutral, inferred=True)
+        return SectionScore(
+            name=name,
+            ratio=neutral,
+            inferred=True,
+            matched=[kw.label for kw in required if _level_factor(profile, kw.id) >= 1.0],
+            partial=[kw.label for kw in required if 0 < _level_factor(profile, kw.id) < 1.0],
+            missing=[kw.label for kw in required if _level_factor(profile, kw.id) == 0.0],
+        )
 
     total = 0.0
     earned = 0.0
@@ -166,8 +179,13 @@ def score_job(job: JobPosting, profile: Profile) -> MatchResult:
 
     req_w = float(scoring.get("requirement_weight", 0.65))
     pref_w = float(scoring.get("preferred_weight", 0.35))
-    denom = req_w + pref_w or 1.0
-    base = (req.ratio * req_w + pref.ratio * pref_w) / denom * 100.0
+    # 공고에 없는 섹션은 중립값으로 깎지 않고 가중평균에서 아예 뺀다
+    pairs = [(section, weight) for section, weight in ((req, req_w), (pref, pref_w)) if section.available]
+    if pairs:
+        denom = sum(weight for _, weight in pairs) or 1.0
+        base = sum(section.ratio * weight for section, weight in pairs) / denom * 100.0
+    else:
+        base = float(scoring.get("unknown_section_score", 0.5)) * 100.0
 
     bonuses: list[str] = []
     title_forms = match_forms(job.title)

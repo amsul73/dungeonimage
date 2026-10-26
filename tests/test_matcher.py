@@ -78,10 +78,19 @@ def test_section_score_partial_for_low_level(profile):
 
 
 def test_section_score_missing_keyword(profile):
-    profile.levels.pop("sql", None)
-    section = score_section("자격요건", "SQL 쿼리 작성 능력", profile)
+    for keyword_id in ("sql", "ga"):
+        profile.levels.pop(keyword_id, None)
+    section = score_section("자격요건", "SQL 쿼리 작성 능력, GA4 분석 경험", profile)
     assert section.ratio == 0.0
     assert "SQL" in section.missing
+
+
+def test_section_with_single_keyword_is_held_neutral(profile):
+    """역량이 하나만 잡히면 0%/100% 로 튀므로 판단을 보류한다."""
+    section = score_section("자격요건", "Figma 활용 가능", profile)
+    assert section.inferred is True
+    assert section.ratio == profile.scoring["unknown_section_score"]
+    assert "Figma" in section.matched
 
 
 def test_section_score_is_neutral_when_nothing_detected(profile):

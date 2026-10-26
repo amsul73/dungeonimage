@@ -50,20 +50,37 @@ class HttpClient:
 
     def get_json(self, url: str, params: dict[str, Any] | None = None) -> Any:
         last_error: Exception | None = None
+        detail = ""
         for attempt in range(self.retries):
             try:
                 response = self.session.get(url, params=params, timeout=self.timeout)
+                if response.status_code >= 400:
+                    detail = _body_snippet(response)
                 response.raise_for_status()
                 return response.json()
             except Exception as error:  # 네트워크/파싱 오류 모두 재시도
                 last_error = error
                 if attempt < self.retries - 1:
                     time.sleep(2 ** attempt)
-        raise RuntimeError(f"요청 실패: {url} ({last_error})") from last_error
+        message = f"요청 실패: {url} ({last_error})"
+        if detail:
+            # 원인 파악에 꼭 필요한 응답 본문 일부를 로그에 남긴다
+            message += f"\n  응답 내용: {detail}"
+        raise RuntimeError(message) from last_error
 
     def pause(self) -> None:
         if self.delay:
             time.sleep(self.delay)
+
+
+def _body_snippet(response: Any, limit: int = 300) -> str:
+    """오류 응답 본문 앞부분을 한 줄로 정리해 돌려준다."""
+    try:
+        body = response.text or ""
+    except Exception:
+        return ""
+    body = " ".join(body.split())
+    return body[:limit] + ("…" if len(body) > limit else "")
 
 
 def pick(data: Any, *paths: str, default: Any = None) -> Any:

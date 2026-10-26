@@ -91,14 +91,25 @@ highlights:
 
 # ── 3. 공고 검색 조건 (수집 단계에서 걸러냄) ──────────────────────────────────
 search:
-  # 원티드 직무 태그 id. 기본값 = 서비스 기획자/PM·PO/전략기획 계열
-  #  10110 서비스 기획자 / 10231 PM·PO / 10230 사업개발·기획 / 10229 전략기획
+  # 사용할 수집기. 원티드는 서버에서의 자동 접근을 막아두어(403) 기본에서 제외했습니다.
+  sources: ["saramin"]
+
+  # ── 사람인 공개 API (무료 키 필요: https://oapi.saramin.co.kr) ──
+  saramin_loc_mcd: "101"        # 근무지 대분류: 101 = 서울
+  saramin_job_mid_cd: [2]       # 직무 중분류: 2 = 기획·전략
+  saramin_keywords: ["서비스기획", "서비스 기획", "프로덕트", "PM", "PO", "기획자"]
+  saramin_sort: "pd"            # pd = 등록일 최신순
+  # saramin_job_cd: []          # 직무 소분류까지 좁히고 싶을 때
+  # saramin_edu_lv: ""          # 학력 조건
+
+  # ── 원티드 (로컬 실행 등 접근이 허용된 환경에서만) ──
   wanted_tag_ids: [10110, 10231]
   locations: ["seoul"]          # 서울만
   years: 0                      # 0 = 신입
-  limit_per_page: 50
-  max_pages: 4                  # 한 번 실행에 최대 200건 훑기
-  fetch_detail_limit: 80        # 상세 조회(=점수 계산) 상한. API 과호출 방지용
+
+  limit_per_page: 100           # 사람인은 최대 110
+  max_pages: 4                  # 한 번 실행에 최대 400건 훑기
+  fetch_detail_limit: 200       # 채점할 공고 수 상한
 
 # ── 4. 하드 필터 (조건 안 맞으면 점수 계산 없이 제외) ────────────────────────
 filters:
@@ -123,7 +134,8 @@ scoring:
   preferred_weight: 0.35        # 우대사항 충족도 비중
   title_bonus: 8                # 제목이 타깃 직무와 맞으면 +8점 (최대 100점)
   newcomer_bonus: 5             # 공고에 "신입/주니어" 명시 시 +5점
-  unknown_section_score: 0.5    # 자격요건/우대사항을 못 찾았을 때의 중립값
+  unknown_section_score: 0.5
+  min_keywords_for_confidence: 2    # 자격요건/우대사항을 못 찾았을 때의 중립값
   partial_level_factor:         # 보유 레벨별 반영률
     1: 0.4
     2: 0.7

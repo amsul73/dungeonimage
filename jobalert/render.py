@@ -19,11 +19,18 @@ def subject(results: list[MatchResult], profile: Profile) -> str:
     return f"{prefix} {date} {top.job.company} {top.job.title} {top.score:g}점{extra}"
 
 
+SUMMARY_NOTE = "사람인 등 본문을 제공하지 않는 소스의 공고입니다. 제목·직무 키워드 기준 1차 점수이니 자격요건·우대사항은 링크에서 확인하세요."
+
+
 def _section_lines(result: MatchResult) -> list[str]:
     lines = []
     for section in (result.requirement, result.preferred):
+        if not section.available:
+            continue
         if section.inferred:
-            lines.append(f"{section.name}: 본문에서 항목을 찾지 못해 중립 처리 ({section.ratio * 100:.0f}%)")
+            found = ", ".join(section.matched + section.partial + section.missing)
+            reason = f"판단 근거 부족({found})" if found else "본문에서 항목을 찾지 못함"
+            lines.append(f"{section.name}: {reason} → 중립 처리 ({section.ratio * 100:.0f}%)")
             continue
         detail = []
         if section.matched:
@@ -50,6 +57,8 @@ def to_text(results: list[MatchResult], profile: Profile) -> str:
             out.append(f"   가점: {bonus}")
         for highlight in result.highlights:
             out.append(f"   어필 포인트: {highlight}")
+        if result.job.detail_level == "summary":
+            out.append(f"   ※ {SUMMARY_NOTE}")
         out.append("")
     return "\n".join(out)
 
@@ -79,8 +88,15 @@ def to_html(results: list[MatchResult], profile: Profile) -> str:
         job = result.job
         rows: list[str] = []
         for section in (result.requirement, result.preferred):
+            if not section.available:
+                continue
             if section.inferred:
-                body = '<span style="color:#8a94a6;font-size:13px">본문에서 항목을 찾지 못해 중립 처리</span>'
+                found = section.matched + section.partial + section.missing
+                label = "판단 근거가 적어 중립 처리" if found else "본문에서 항목을 찾지 못해 중립 처리"
+                body = (
+                    f'<span style="color:#8a94a6;font-size:13px">{html.escape(label)}</span>'
+                    + _chips(found, "#42506b", "#eceff3")
+                )
             else:
                 body = (
                     _chips(section.matched, "#0b6b3a", "#e3f5ea")
@@ -113,6 +129,12 @@ def to_html(results: list[MatchResult], profile: Profile) -> str:
             if job.location
             else ""
         )
+        note = (
+            '<div style="margin-top:10px;font-size:12px;color:#8a5a00;background:#fdf0d5;'
+            f'padding:8px 10px;border-radius:8px">※ {html.escape(SUMMARY_NOTE)}</div>'
+            if job.detail_level == "summary"
+            else ""
+        )
         cards.append(
             f"""
 <div style="border:1px solid #e3e7ee;border-radius:12px;padding:16px;margin:0 0 14px 0">
@@ -124,6 +146,7 @@ def to_html(results: list[MatchResult], profile: Profile) -> str:
   <table style="border-collapse:collapse;width:100%">{''.join(rows)}</table>
   {bonus}
   {highlight}
+  {note}
   <div style="margin-top:12px">
     <a href="{html.escape(job.url)}" style="display:inline-block;padding:8px 14px;background:#2f6fed;color:#fff;
        border-radius:8px;text-decoration:none;font-size:13px">공고 보기</a>

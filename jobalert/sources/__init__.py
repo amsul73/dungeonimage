@@ -5,11 +5,13 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from .base import HttpClient, Source, pick
+from .saramin import SaraminSource
 from .wanted import WantedSource
 
 SourceFactory = Callable[[dict[str, Any]], Source]
 
 REGISTRY: dict[str, SourceFactory] = {
+    "saramin": lambda search: SaraminSource(search),
     "wanted": lambda search: WantedSource(search),
 }
 
@@ -24,4 +26,12 @@ def build_sources(names: list[str], search: dict[str, Any]) -> list[Source]:
     return sources
 
 
-__all__ = ["HttpClient", "Source", "WantedSource", "REGISTRY", "build_sources", "pick"]
+__all__ = [
+    "HttpClient",
+    "Source",
+    "SaraminSource",
+    "WantedSource",
+    "REGISTRY",
+    "build_sources",
+    "pick",
+]

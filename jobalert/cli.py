@@ -27,7 +27,10 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     run_cmd = sub.add_parser("run", help="공고 수집 → 채점 → 알림")
-    run_cmd.add_argument("--source", action="append", default=None, help="수집기 (기본: wanted)")
+    run_cmd.add_argument(
+        "--source", action="append", default=None,
+        help="수집기 (기본: profile.yaml 의 search.sources, 없으면 saramin)",
+    )
     run_cmd.add_argument("--notifier", default="email", choices=["email", "console"])
     run_cmd.add_argument("--state", default=str(DEFAULT_STATE), help="알림 기록 파일")
     run_cmd.add_argument("--threshold", type=float, default=None, help="알림 최소 점수 덮어쓰기")
@@ -41,8 +44,9 @@ def build_parser() -> argparse.ArgumentParser:
     score_cmd.add_argument("--company", default="(회사 미입력)")
     score_cmd.add_argument("--location", default="서울")
 
-    probe_cmd = sub.add_parser("probe", help="원티드 API 응답 구조를 눈으로 확인")
-    probe_cmd.add_argument("--job-id", default=None, help="상세 조회할 공고 id")
+    probe_cmd = sub.add_parser("probe", help="채용 API 응답 구조를 눈으로 확인")
+    probe_cmd.add_argument("--source", default="saramin", choices=["saramin", "wanted"])
+    probe_cmd.add_argument("--job-id", default=None, help="상세 조회할 공고 id (원티드만)")
     probe_cmd.add_argument("--save", default=None, help="응답 JSON 저장 경로")
 
     sub.add_parser("profile", help="profile.yaml 파싱 결과 확인")
@@ -88,9 +92,10 @@ def cmd_run(args: argparse.Namespace) -> int:
                 store.save()
     else:
         notifier = build_notifier(args.notifier) if args.notifier else None
+        source_names = args.source or [str(s) for s in (profile.search.get("sources") or ["saramin"])]
         report = run(
             profile,
-            source_names=args.source or ["wanted"],
+            source_names=source_names,
             store=store,
             notifier=notifier,
             dry_run=args.dry_run,
@@ -137,13 +142,23 @@ def cmd_score(args: argparse.Namespace) -> int:
 
 def cmd_probe(args: argparse.Namespace) -> int:
     profile = _load_profile(args)
-    from .sources.wanted import API_LIST, WantedSource
+    if args.source == "saramin":
+        from .sources.saramin import API_URL, SaraminSource
 
-    source = WantedSource(profile.search)
-    if args.job_id:
-        payload = source.fetch_detail(args.job_id)
+        source = SaraminSource(profile.search)
+        if not source.access_key:
+            print("SARAMIN_API_KEY 가 설정되지 않았습니다 (.env 또는 환경변수).", file=sys.stderr)
+            return 1
+        payload = source.client.get_json(API_URL, source.list_params(0))
     else:
-        payload = source.client.get_json(API_LIST, source.list_params(0))
+        from .sources.wanted import API_LIST, WantedSource
+
+        wanted = WantedSource(profile.search)
+        payload = (
+            wanted.fetch_detail(args.job_id)
+            if args.job_id
+            else wanted.client.get_json(API_LIST, wanted.list_params(0))
+        )
     text = json.dumps(payload, ensure_ascii=False, indent=2)
     if args.save:
         Path(args.save).write_text(text + "\n", encoding="utf-8")

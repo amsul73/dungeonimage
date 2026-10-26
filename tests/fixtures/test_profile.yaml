@@ -68,6 +68,7 @@ scoring:
   title_bonus: 8
   newcomer_bonus: 5
   unknown_section_score: 0.5
+  min_keywords_for_confidence: 2
   partial_level_factor:
     1: 0.4
     2: 0.7

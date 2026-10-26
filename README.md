@@ -5,7 +5,7 @@
 
 - 대상 직무: 서비스 기획자 / PM·PO **신입**
 - 근무지: **서울**만
-- 수집: 원티드(wanted.co.kr) — 다른 사이트는 수집기만 추가하면 붙습니다
+- 수집: **사람인 공개 API**(공식, 무료 키) — 다른 사이트는 수집기만 추가하면 붙습니다
 - 실행: GitHub Actions 로 하루 2회 자동 실행 (내 PC 꺼져 있어도 동작)
 
 ```
@@ -24,6 +24,9 @@
 | 자격요건 충족도 | 자격요건에서 찾은 역량의 가중치 합 중, 내가 보유한 비율 (0~100%) |
 | 우대사항 충족도 | 우대사항에서 찾은 역량의 가중치 합 중, 내가 보유한 비율 (0~100%) |
 | 총점 | 자격요건 × 0.65 + 우대사항 × 0.35 (+ 제목 적합 +8 / 신입 명시 +5) |
+
+- 공고에 **아예 없는 섹션**(예: 우대사항 미기재)은 중립값으로 깎지 않고 **가중평균에서 제외**합니다.
+- 섹션에서 잡힌 역량이 `min_keywords_for_confidence`(기본 2개)보다 적으면 0%/100%로 튀므로 **판단 보류(중립 50%)** 로 둡니다.
 
 - 보유 레벨이 낮으면(1~2) **부분 점수**만 반영됩니다 (`scoring.partial_level_factor`).
 - 자격요건/우대사항에서 아는 역량을 하나도 못 찾으면 그 섹션은 중립값 50%로 둡니다
@@ -96,8 +99,39 @@ python main.py run
 | `run` | 수집 → 채점 → 알림. `--dry-run`(기록 안 남김), `--verbose`(제외/미달 공고도 출력), `--threshold 70`, `--notifier console`, `--fixture <json>` |
 | `score <파일>` | JD 텍스트 하나를 채점 (`-` 는 표준입력) |
 | `profile` | `profile.yaml` 파싱 결과 확인 |
-| `probe` | 원티드 API 응답 원본 확인 (`--job-id`, `--save out.json`) |
+| `probe` | API 응답 원본 확인 (`--source saramin|wanted`, `--save out.json`) |
 | `test-mail` | 샘플 공고로 메일 발송 테스트 |
+
+---
+
+## 4-0. 사람인 API 키 발급
+
+1. https://oapi.saramin.co.kr 접속 → 사람인 계정으로 로그인
+2. API 이용 신청 → 발급된 **access-key** 복사
+3. 로컬은 `.env` 의 `SARAMIN_API_KEY`, 자동 실행은 GitHub Secrets 의 `SARAMIN_API_KEY` 에 넣습니다
+
+키가 제대로 동작하는지 확인:
+
+```bash
+python main.py probe --source saramin --save out.json   # 응답 원본 확인
+```
+
+### 원티드를 쓰지 않는 이유
+
+원티드는 서버에서의 API 자동 호출을 차단합니다(GitHub Actions 에서 `403 Forbidden`).
+차단을 우회하지 않고 공식 API 를 제공하는 사람인을 기본 수집기로 씁니다.
+`jobalert/sources/wanted.py` 는 접근이 허용된 환경을 위해 남겨두었고,
+`profile.yaml` 의 `search.sources` 에 `wanted` 를 넣으면 다시 사용됩니다.
+
+### 사람인 API 의 한계
+
+이 API 는 **JD 본문(자격요건·우대사항 전문)을 제공하지 않습니다.** 제목·직무 분류·공고 키워드만 옵니다.
+그래서 이 소스의 공고는 `summary` 로 표시되고, 메일에도 "본문은 링크에서 확인" 안내가 붙습니다.
+자격요건·우대사항을 정밀하게 채점하려면 관심 공고의 JD를 복사해 아래처럼 돌리세요.
+
+```bash
+python main.py score jd.txt --title "서비스 기획자" --company "OO"
+```
 
 ---
 
@@ -115,13 +149,16 @@ python main.py run
 | `SMTP_PASSWORD` | 앱 비밀번호 16자리 |
 | `MAIL_FROM` | `nansin5373@gmail.com` |
 | `MAIL_TO` | 받을 주소(쉼표로 여러 개 가능) |
+| `SARAMIN_API_KEY` | 사람인 access-key (4-0 참고) |
 
 ---
 
 ## 5. GitHub Actions 자동 실행
 
 1. 이 저장소 → **Settings → Secrets and variables → Actions → New repository secret** 에서
-   위 표의 6개 키를 등록합니다.
+   위 표의 7개 키를 등록합니다(하나씩 따로 등록).
+   **Settings → Actions → General → Workflow permissions** 는 `Read and write permissions` 여야
+   알림 기록 커밋이 성공합니다.
 2. **Actions** 탭에서 워크플로를 활성화합니다.
 3. `.github/workflows/job-alert.yml` 이 매일 **09:17 / 18:17 (KST)** 에 실행됩니다.
    `Run workflow` 버튼으로 즉시 실행도 됩니다(`dry_run`, `threshold` 입력 가능).
@@ -143,6 +180,7 @@ python main.py run
 | 판교·분당도 보고 싶다 | `filters.seoul_tokens` 에 `"판교"`, `"분당"` 추가 또는 `require_seoul: false` |
 | 경력 1~2년 공고도 보고 싶다 | `filters.max_required_years` 올리기 |
 | 수집량을 늘리고 싶다 | `search.max_pages`, `search.fetch_detail_limit` 올리기 |
+| 기획 외 직무가 섞인다 | `search.saramin_job_mid_cd` / `saramin_keywords` 로 직무를 좁히기 |
 
 `--verbose` 로 돌리면 **왜 제외됐는지 / 몇 점이었는지**가 전부 출력되니 기준 조정에 쓰세요.
 
@@ -162,10 +200,10 @@ jobalert/
   pipeline.py            수집 → 채점 → 알림 흐름
   store.py               알림 보낸 공고 기록(중복 방지)
   render.py              메일 제목/본문(HTML·텍스트)
-  sources/               공고 수집기 (base.py, wanted.py, 레지스트리)
+  sources/               공고 수집기 (base.py, saramin.py, wanted.py, 레지스트리)
   notifiers/             알림 채널 (email.py, console.py)
 state/seen.json          알림 기록
-tests/                   pytest (51개, 테스트용 프로필 분리)
+tests/                   pytest (63개, 테스트용 프로필 분리)
 ```
 
 ### 수집 사이트 추가하기
@@ -184,10 +222,10 @@ pip install pytest && python -m pytest tests -q
 
 ## 알아둘 점
 
-- 원티드의 JSON 엔드포인트는 공식 공개 API가 아니라 웹 프론트엔드가 쓰는 주소입니다.
-  구조가 바뀌면 수집이 깨질 수 있어 모든 필드를 여러 경로로 시도하도록 만들었고,
-  문제가 생기면 `python main.py probe --save out.json` 으로 실제 응답을 확인한 뒤
-  `jobalert/sources/wanted.py` 의 `to_posting()` 경로만 고치면 됩니다.
-- `search.wanted_tag_ids` 의 직무 태그 id(`10110`, `10231`)는 원티드 직무 분류값입니다.
-  원하는 직무 목록 페이지(`wanted.co.kr/wdlist/...`) URL의 숫자로 바꿔 쓰거나,
-  `probe` 로 응답을 보며 조정하세요. 태그가 맞지 않아도 제목·본문 기반 필터가 한 번 더 걸러줍니다.
+- 사람인 공개 API 는 공식 API 이지만 공고 **본문**을 주지 않습니다(위 4-0 참고).
+  넓게 거르는 것은 자동, 정밀 채점은 `score` 명령으로 반자동이라고 생각하시면 됩니다.
+- `search.saramin_loc_mcd`(서울=101), `saramin_job_mid_cd`(기획·전략=2) 는 사람인 분류 코드입니다.
+  수집 결과가 이상하면 `python main.py probe --source saramin --save out.json` 으로
+  실제 응답을 확인한 뒤 코드를 조정하세요.
+- 사람인 공고에는 이미지로만 올라온 공고가 많아, 그런 공고는 키워드가 적게 잡혀
+  "판단 보류(중립)" 로 처리됩니다. 점수가 63점 근처에 몰려 있으면 대부분 이 경우입니다.
