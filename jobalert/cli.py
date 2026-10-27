@@ -7,12 +7,13 @@ import json
 import sys
 from pathlib import Path
 
+from . import demand as demand_mod
 from . import render
 from .config import DEFAULT_KEYWORDS, DEFAULT_PROFILE, DEFAULT_STATE, Profile, load_dotenv
 from .matcher import check_filters, required_years, score_job
 from .models import JobPosting
 from .notifiers import build_notifier
-from .pipeline import evaluate, run
+from .pipeline import collect, evaluate, run
 from .store import SeenStore
 from .text import split_sections
 
@@ -37,6 +38,28 @@ def build_parser() -> argparse.ArgumentParser:
     run_cmd.add_argument("--dry-run", action="store_true", help="기록 저장 없이 결과만 확인")
     run_cmd.add_argument("--fixture", default=None, help="네트워크 대신 JSON 파일에서 공고 읽기")
     run_cmd.add_argument("--verbose", action="store_true", help="제외된 공고까지 출력")
+
+    scan_cmd = sub.add_parser(
+        "scan", help="공고 묶음을 훑어 직무가 공통적으로 요구하는 역량 빈도를 집계",
+    )
+    scan_cmd.add_argument(
+        "--jd-dir", default=None,
+        help="JD 본문 텍스트 파일 폴더 (예: jd). 빈도 분석은 본문이 있어야 의미가 있습니다",
+    )
+    scan_cmd.add_argument(
+        "--source", action="append", default=None,
+        help="추가로 수집할 소스 (기본: --jd-dir 만 주면 수집 생략)",
+    )
+    scan_cmd.add_argument("--fixture", default=None, help="네트워크 대신 JSON 파일에서 공고 읽기")
+    scan_cmd.add_argument("--no-filters", action="store_true",
+                          help="하드 필터(서울/경력)를 끄고 모든 공고를 집계")
+    scan_cmd.add_argument("--include-summary", action="store_true",
+                          help="JD 본문이 없는 요약 공고도 집계에 포함(빈도가 왜곡될 수 있음)")
+    scan_cmd.add_argument("--top", type=int, default=25, help="콘솔에 출력할 역량 수")
+    scan_cmd.add_argument("--min-phrase-df", type=int, default=None,
+                          help="미등록 표현을 보고할 최소 등장 공고 수 (기본: 표본의 10%%)")
+    scan_cmd.add_argument("--markdown", default=None, help="마크다운 리포트 저장 경로")
+    scan_cmd.add_argument("--json", dest="json_out", default=None, help="JSON 저장 경로")
 
     score_cmd = sub.add_parser("score", help="붙여넣은 JD 텍스트 파일 하나를 채점")
     score_cmd.add_argument("path", help="JD 텍스트 파일 경로 ('-' 는 표준입력)")
@@ -112,6 +135,62 @@ def cmd_run(args: argparse.Namespace) -> int:
     for result in report.matches:
         print(f"  + {result.score:g}점 {result.job.company} {result.job.title} {result.job.url}")
     return 1 if report.errors and not report.matches else 0
+
+
+def cmd_scan(args: argparse.Namespace) -> int:
+    profile = _load_profile(args)
+    postings: list[JobPosting] = []
+    errors: list[str] = []
+
+    if args.jd_dir:
+        from .jdfiles import load_dir
+
+        postings.extend(load_dir(args.jd_dir))
+    if args.fixture:
+        postings.extend(_postings_from_fixture(args.fixture))
+    if args.source or (not args.jd_dir and not args.fixture):
+        names = args.source or [str(s) for s in (profile.search.get("sources") or ["saramin"])]
+        fetched, fetch_errors = collect(profile, names)
+        postings.extend(fetched)
+        errors.extend(fetch_errors)
+
+    if not args.no_filters:
+        kept: list[JobPosting] = []
+        dropped = 0
+        for job in postings:
+            # 직접 모아둔 JD 파일은 이미 관심 공고이므로 필터를 적용하지 않는다
+            if job.source == "jdfile" or check_filters(job, profile) is None:
+                kept.append(job)
+            else:
+                dropped += 1
+        if dropped:
+            print(f"하드 필터로 {dropped}건 제외 (--no-filters 로 끌 수 있습니다)")
+        postings = kept
+
+    report = demand_mod.analyze(
+        postings,
+        profile,
+        include_summary=args.include_summary,
+        min_phrase_df=args.min_phrase_df,
+    )
+    report.errors.extend(errors)
+    print(demand_mod.to_text(report, profile, top=args.top))
+
+    if args.markdown:
+        Path(args.markdown).write_text(
+            demand_mod.to_markdown(report, profile), encoding="utf-8"
+        )
+        print(f"\n마크다운 리포트 저장: {args.markdown}")
+    if args.json_out:
+        Path(args.json_out).write_text(
+            json.dumps(demand_mod.to_dict(report, profile), ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        print(f"JSON 저장: {args.json_out}")
+
+    for error in errors:
+        print(f"[오류] {error}", file=sys.stderr)
+    return 1 if (errors and report.analyzed == 0) else 0
 
 
 def cmd_score(args: argparse.Namespace) -> int:
@@ -213,6 +292,7 @@ def cmd_test_mail(args: argparse.Namespace) -> int:
 
 COMMANDS = {
     "run": cmd_run,
+    "scan": cmd_scan,
     "score": cmd_score,
     "probe": cmd_probe,
     "profile": cmd_profile,
