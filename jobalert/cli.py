@@ -51,6 +51,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="추가로 수집할 소스 (기본: --jd-dir 만 주면 수집 생략)",
     )
     scan_cmd.add_argument("--fixture", default=None, help="네트워크 대신 JSON 파일에서 공고 읽기")
+    scan_cmd.add_argument(
+        "--limit", type=int, default=None,
+        help="수집할 공고 수 상한 (profile.yaml 의 search.fetch_detail_limit 을 덮어씀). "
+             "처음엔 30 정도로 짧게 돌려보세요",
+    )
     scan_cmd.add_argument("--no-filters", action="store_true",
                           help="하드 필터(서울/경력)를 끄고 모든 공고를 집계")
     scan_cmd.add_argument("--include-summary", action="store_true",
@@ -149,6 +154,8 @@ def cmd_scan(args: argparse.Namespace) -> int:
     if args.fixture:
         postings.extend(_postings_from_fixture(args.fixture))
     if args.source or (not args.jd_dir and not args.fixture):
+        if args.limit is not None:
+            profile.raw.setdefault("search", {})["fetch_detail_limit"] = args.limit
         names = args.source or [str(s) for s in (profile.search.get("sources") or ["saramin"])]
         fetched, fetch_errors = collect(profile, names)
         postings.extend(fetched)

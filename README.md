@@ -93,11 +93,34 @@ python -m pytest tests -q    # profile.yaml 오타·구조 오류까지 검사
 | **이미 가진 고빈도 역량** | 등장률이 높고 내가 이미 가진 것 → 이력서 맨 앞에 둘 항목 |
 | **사전 미등록 빈출 표현** | `keywords.yaml` 에 없는데 자주 나오는 말 → 사전에 추가할 후보 |
 
-### 먼저 JD 본문을 모아야 합니다
+### 먼저 JD 본문이 필요합니다 — 두 가지 방법
 
 사람인 공개 API 는 **JD 본문을 주지 않습니다**(아래 4-0 참고). 제목·직무분류·키워드만 옵니다.
-빈도 분석은 본문이 있어야 의미가 있으므로, 관심 공고의 **주요업무 / 자격요건 / 우대사항**을
-복사해 `jd/` 폴더에 텍스트 파일로 모아두세요. 파일 이름은 `회사명_직무명.txt` 권장.
+빈도 분석은 본문이 있어야 의미가 있으므로 아래 둘 중 하나를 씁니다.
+
+#### 방법 A (권장) — 원티드 자동 수집, **내 PC 에서**
+
+원티드는 JD 를 `주요업무 / 자격요건 / 우대사항` **섹션별 필드로** 내려줍니다.
+이미지로 올라온 공고 문제도 없고, 복사할 일도 없습니다.
+
+```bash
+# 처음엔 30건으로 짧게 (몇십 초)
+python main.py scan --source wanted --limit 30
+
+# 괜찮으면 넓게 + 리포트 저장 (공고당 상세 조회가 1회씩 들어가 수 분 걸립니다)
+python main.py scan --source wanted --limit 150 --markdown 요구역량.md --json 요구역량.json
+```
+
+> **반드시 내 PC 에서 돌려야 합니다.** 원티드는 서버에서의 자동 호출을 차단하고(GitHub Actions
+> 에서 `403`), 클라우드 세션에서도 네트워크 정책에 막힙니다. 알림(`run`)은 클라우드 자동,
+> 요구역량 분석(`scan`)은 로컬 수동 — 이렇게 나누는 게 맞습니다. `scan` 은 한 달에 한 번이면
+> 충분한 작업입니다.
+
+#### 방법 B — JD 본문을 직접 모으기
+
+원티드에 없는 공고를 넣고 싶거나, 특정 공고만 깊게 보고 싶을 때 씁니다.
+관심 공고의 **주요업무 / 자격요건 / 우대사항**을 복사해 `jd/` 폴더에 저장하세요.
+파일 이름은 `회사명_직무명.txt` 권장.
 
 ```
 jd/
@@ -113,11 +136,14 @@ jd/
 ### 실행
 
 ```bash
-# JD 폴더만 집계 (네트워크 불필요)
-python main.py scan --jd-dir jd
+# 원티드 자동 수집 (방법 A, 로컬 전용) — 가장 손이 덜 갑니다
+python main.py scan --source wanted --limit 30
 
-# 마크다운/JSON 리포트까지 저장
+# 직접 모은 JD 폴더만 집계 (방법 B, 네트워크 불필요)
 python main.py scan --jd-dir jd --markdown 요구역량.md --json 요구역량.json
+
+# 둘을 합쳐서 집계
+python main.py scan --jd-dir jd --source wanted --limit 100
 
 # 사람인 수집분까지 함께 보기 (본문 없는 공고는 직무 태그 빈도로만 참고 집계)
 python main.py scan --jd-dir jd --source saramin
@@ -128,6 +154,7 @@ python main.py scan --jd-dir jd --source saramin
 | `--jd-dir <폴더>` | JD 본문 파일 폴더. 하위 폴더까지 읽습니다 |
 | `--source <이름>` | 수집기도 함께 돌림. `--jd-dir` 만 주면 수집은 생략됩니다 |
 | `--fixture <json>` | 네트워크 대신 JSON 파일에서 공고 읽기 |
+| `--limit <n>` | 수집할 공고 수 상한 (`search.fetch_detail_limit` 덮어씀). 첫 실행은 30 권장 |
 | `--no-filters` | 서울·신입 하드 필터를 끄고 전부 집계 (시장 전체를 보고 싶을 때) |
 | `--include-summary` | 본문 없는 요약 공고도 집계에 포함 — **빈도가 왜곡되니 권장하지 않음** |
 | `--top <n>` | 콘솔에 출력할 역량 수 (기본 25) |
@@ -188,7 +215,7 @@ python main.py run
 | 명령 | 설명 |
 |---|---|
 | `run` | 수집 → 채점 → 알림. `--dry-run`(기록 안 남김), `--verbose`(제외/미달 공고도 출력), `--threshold 70`, `--notifier console`, `--fixture <json>` |
-| `scan` | 공고 묶음에서 **공통 요구 역량 빈도**를 집계 (`--jd-dir jd`, `--markdown out.md`, `--json out.json`) → [2-1절](#2-1-scan--이-직무가-공통적으로-뭘-요구하는지-보기) |
+| `scan` | 공고 묶음에서 **공통 요구 역량 빈도**를 집계. `--source wanted --limit 30`(로컬) 또는 `--jd-dir jd` → [2-1절](#2-1-scan--이-직무가-공통적으로-뭘-요구하는지-보기) |
 | `score <파일>` | JD 텍스트 하나를 채점 (`-` 는 표준입력) |
 | `profile` | `profile.yaml` 파싱 결과 확인 |
 | `probe` | API 응답 원본 확인 (`--source saramin|wanted`, `--save out.json`) |
@@ -211,9 +238,11 @@ python main.py probe --source saramin --save out.json   # 응답 원본 확인
 ### 원티드를 쓰지 않는 이유
 
 원티드는 서버에서의 API 자동 호출을 차단합니다(GitHub Actions 에서 `403 Forbidden`).
-차단을 우회하지 않고 공식 API 를 제공하는 사람인을 기본 수집기로 씁니다.
-`jobalert/sources/wanted.py` 는 접근이 허용된 환경을 위해 남겨두었고,
-`profile.yaml` 의 `search.sources` 에 `wanted` 를 넣으면 다시 사용됩니다.
+차단을 우회하지 않고 공식 API 를 제공하는 사람인을 **자동 알림(`run`)의** 기본 수집기로 씁니다.
+
+다만 **로컬 PC 에서는 원티드가 정상 동작하고, JD 본문을 섹션별로 주기 때문에**
+요구역량 분석(`scan`)에는 원티드가 훨씬 좋습니다([2-1절](#2-1-scan--이-직무가-공통적으로-뭘-요구하는지-보기)).
+`profile.yaml` 의 `search.sources` 에 `wanted` 를 넣거나 `--source wanted` 로 쓰면 됩니다.
 
 ### 사람인 API 의 한계
 
@@ -300,7 +329,7 @@ jobalert/
   notifiers/             알림 채널 (email.py, console.py)
 jd/                      scan 용 JD 본문 보관함 (txt 는 커밋 제외)
 state/seen.json          알림 기록
-tests/                   pytest (82개, 테스트용 프로필 분리)
+tests/                   pytest (86개, 테스트용 프로필 분리)
 ```
 
 ### 수집 사이트 추가하기
