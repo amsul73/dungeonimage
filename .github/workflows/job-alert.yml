@@ -1,9 +1,10 @@
 name: 채용공고 매칭 알림
 
 on:
-  schedule:
-    # 매일 09:17, 18:17 (KST) = 00:17, 09:17 (UTC)
-    - cron: "17 0,9 * * *"
+  # 자동 실행 중지 (2026-10-30). 다시 켜려면 아래 schedule 두 줄의 주석을 푸세요.
+  # schedule:
+  #   # 매일 09:17, 18:17 (KST) = 00:17, 09:17 (UTC)
+  #   - cron: "17 0,9 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
